@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+		<title>Room-Test</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css">
+		<link rel="stylesheet" href="/css/index.css">
+		<script type="importmap">
+			{
+				"imports": {
+					"Leaflet": "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/+esm",
+					"Room": "https://cdn.jsdelivr.net/npm/room-js@1.0.0",
+					"RoomLeaflet": "https://cdn.jsdelivr.net/npm/room-leaflet@1.0.0",
+					"SimpleExamples": "/esm/simple-examples.js",
+					"TodoListExamples": "/esm/todolist-examples.js",
+					"MapExamples": "/esm/map-examples.js"
+				}
+			}
+		</script>
+		<script>
+			(function() {
+				if (!(HTMLScriptElement.supports && HTMLScriptElement.supports("importmap"))) {
+					var s = document.createElement("script");
+					if ("noModule" in s) {
+						s.src = "https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js";
+						s.async = true;
+						document.head.appendChild(s);
+					}
+				}
+			})();
+		</script>
+		<script src="/esm/index.js" type="module"></script>
+	</head>
+	<body></body>
+</html>

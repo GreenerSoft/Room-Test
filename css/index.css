@@ -1,0 +1,141 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	text-size-adjust: none;
+	-webkit-font-smoothing: antialiased;
+	font-family: Helvetica, sans-serif;
+	font-size: 16px;
+	color: white;
+	background-color: #111111;
+	color-scheme: dark;
+}
+
+header {
+	position: fixed;
+	z-index: 10000;
+	display: flex;
+	align-items: center;
+	top: 0;
+	width: 100%;
+	height: 40px;
+	padding: 0 10px;
+	background-color: black;
+	border-bottom: 1px solid #666666;
+}
+
+main {
+	margin-top: 40px;
+	padding: 10px;
+}
+
+main > div {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 60px);
+}
+
+main > div > p {
+	margin: 0 0 10px 0;
+	line-height: 30px;
+}
+
+form {
+	display: flex;
+	margin: 4px 0;
+	align-items: center;
+}
+
+input,
+button,
+select {
+	font-size: 16px;
+	color-scheme: dark;
+}
+
+input[type="text"] {
+	margin: 2px 4px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+	background: linear-gradient(rgb(0, 127, 255) 0 0) 50%/100% 5px no-repeat;
+}
+
+input[type="search"] {
+	color-scheme: light;
+	margin-bottom: 10px;
+	padding-left: 4px;
+	font-size: 16px;
+	border-width: 1px;
+	border-radius: 4px;
+}
+
+button {
+	margin: 0 4px;
+}
+
+label {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.leaflet-container {
+	flex: 1;
+	width: 100%;
+    border-radius: 4px;
+}
+
+.leaflet-container .leaflet-popup a {
+	font-size: 16px;
+	color: var(--link-color);
+	text-decoration: none;
+}
+
+.leaflet-container .leaflet-popup a:after {
+	background-color: black !important;
+}
+
+.leaflet-container .leaflet-popup a:hover {
+	text-decoration: underline;
+}
+
+.marker {
+	width: 48px;
+	height: 48px;
+	background-position: center center;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+.marker.blue {
+	background-image: url("/img/marker-blue.svg");
+}
+
+.marker.red {
+	background-image: url("/img/marker-red.svg");
+}
+
+.mapPopup ul {
+	color-scheme: light;
+	overflow: scroll;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+	color: black;
+	text-align: left;
+	line-height: normal;
+}
+
+.mapPopup li strong {
+	color: black;
+}
