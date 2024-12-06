@@ -139,3 +139,37 @@ label {
 .mapPopup li strong {
 	color: black;
 }
+
+hr {
+	width: 100%;
+}
+
+.bounceLoader {
+	display: flex;
+	flex: 1;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.bounceLoader > div {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	background-color: white;
+	border-radius: 100%;
+	animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.bounceLoader div:nth-child(1) {
+	animation-delay: -0.32s;
+}
+
+.bounceLoader div:nth-child(2) {
+	animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+	 0%, 80%, 100% { transform: scale(0); }
+	 40% { transform: scale(1.0);  }
+}

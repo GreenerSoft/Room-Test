@@ -1,10 +1,11 @@
-/*! RoomTest-nm v1.0.0 | (c) GreenerSoft | https://roomjs.fr | MIT License */
+/*! RoomTest-nm v1.1.0 | (c) GreenerSoft | https://roomjs.fr | MIT License */
 
 
 var SimpleExamples = (() => {
 	"use strict";
 
 	const {elements, createData, setData, createEffect, map} = Room;
+	const {Suspense} = RoomSuspense;
 
 
 	function DoubleCount1() {
@@ -86,6 +87,66 @@ var SimpleExamples = (() => {
 		);
 	}
 	
-	return {DoubleCount1, DoubleCount2, SymbolToPrimitive, ArrayManipulation};	
+	function StyleExample() {
+		const {div, label, strong, p, select, option} = elements();
+		const colors = ["white", "red", "orange", "green", "gray"];
+		const backgroundColors = ["transparent", ...colors];
+		const color = createData(colors[0]);
+		const backgroundColor = createData(backgroundColors[0]);
+		
+		return div(
+			p(
+				label(strong("Couleur du texte : "),
+					select({onChange: e => color.value = e.target.value},
+						colors.map(c => option({value: c}, c))
+					)
+				)
+			),
+			p(
+				label(strong("Couleur du fond : "),
+					select({onChange: e => backgroundColor.value = e.target.value},
+						backgroundColors.map(c => option({value: c}, c))
+					)
+				)
+			),
+			p({style: {color}}, {style: {backgroundColor}}, strong("Texte de couleur : "), color, " (avec un objet)"),
+			p({style: () => "color:" + color + ";background-color:" + backgroundColor}, strong("Texte de couleur : "), color, " (avec une chaîne de caractères)")
+		);
+	}
+	
+	function SuspenseExample() {
+		const {div, h1, h2, hr} = elements(); 
+		const load = s => new Promise(resolve => setTimeout(() => resolve(h2(`Chargé ${s} secondes`)), s * 1000));
+		const loadWithError = s => new Promise((resolve, reject) => setTimeout(() => reject(h2(`Erreur ${s} secondes`)), s * 1000)).catch(e => e);
+		return div(
+			Suspense({fallback: h1("Chargement 1 et 3 secondes ...")},
+				load(1),
+				load(3)
+			),
+			hr(),
+			Suspense({fallback: h1("Chargement 5 et 7 secondes ...")},
+				load(5),
+				Suspense({fallback: h1("Chargement 7 secondes ...")},
+					load(7)
+				)
+			),
+			hr(),
+			Suspense({fallback: h1("Chargement 9 et 11 secondes avec erreur ...")},
+				loadWithError(9),
+				load(11)
+			),
+			hr(),
+			Suspense({fallback: h1("Chargement 13 secondes ...")},
+				load(13)
+			),
+			hr(),
+			Suspense({},
+				load(6)
+			),
+			hr()
+		);
+	}
+	
+	return {DoubleCount1, DoubleCount2, SymbolToPrimitive, ArrayManipulation, StyleExample, SuspenseExample};	
 
 })();

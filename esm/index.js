@@ -1,8 +1,8 @@
-/*! RoomTest v1.0.0 | (c) GreenerSoft | https://roomjs.fr | MIT License */
+/*! RoomTest v1.1.0 | (c) GreenerSoft | https://roomjs.fr | MIT License */
 
 
-import {elements, append, createData, setData, getData, createEffect, untrack} from "Room";
-import {DoubleCount1, DoubleCount2, SymbolToPrimitive, ArrayManipulation} from "SimpleExamples";
+import {elements, append, createData, setData, getData, untrack} from "Room";
+import {DoubleCount1, DoubleCount2, SymbolToPrimitive, ArrayManipulation, StyleExample, SuspenseExample} from "SimpleExamples";
 import {MapReactive, MapIPGeolocation, MapGeoJSON, MapNexrad, MapNexradAnimated, MapWorldRadarAnimated} from "MapExamples";
 import {TodoListExample, TodoListObjectExample, TodoListArrayDeleteExample} from "TodoListExamples";
 
@@ -14,6 +14,8 @@ function App() {
 		{name: "DoubleCount2", component: DoubleCount2},
 		{name: "SymbolToPrimitive", component: SymbolToPrimitive},
 		{name: "ArrayManipulation", component: ArrayManipulation},
+		{name: "Style", component: StyleExample},
+		{name: "Suspense", component: SuspenseExample},
 		{name: "ToDolist", component: TodoListExample},
 		{name: "TodoListObject", component: TodoListObjectExample},
 		{name: "TodoListArrayDelete", component: TodoListArrayDeleteExample},
@@ -34,15 +36,16 @@ function App() {
 			localStorage.setItem(name, JSON.stringify(getData(index)));
 		} catch(e) {}
 	};
-	const container = main({onUnmount: save, onPageHide: save});
-	createEffect(async () => container.replaceChildren(await untrack(components[index].component)));
+	
 	return [
 		header(
 			select({onChange: e => index.value = e.target.value},
 				components.map((c, i) => option({value: i, selected: i == index.value}, c.name))
 			)
 		),
-		container
+		main({onUnmount: save, onPageHide: save},
+			() => untrack(components[index].component)
+		)
 	];
 }
 

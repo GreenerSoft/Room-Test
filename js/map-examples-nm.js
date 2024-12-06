@@ -1,13 +1,19 @@
-/*! RoomTest-nm v1.0.0 | (c) GreenerSoft | https://roomjs.fr | MIT License */
+/*! RoomTest-nm v1.1.0 | (c) GreenerSoft | https://roomjs.fr | MIT License */
 
 
 var MapExamples = (() => {
 	"use strict";
 
 	const {elements, createData, setData, createEffect} = Room;
+	const {Suspense} = RoomSuspense;
 	const {EUCenter, FranceCenter, USACenter, OpenStreetMapProvider, L, addTileLayer, MapContainer} = RoomLeaflet;
 	
 
+	function BounceLoader() {
+		const {div} = elements();
+		return div({class: "bounceLoader"}, div(), div(), div());
+	}
+	
 	/* Source : https://mesonet.agron.iastate.edu/ogc/ */
 	const NexradProvider = () => ({
 		wms: true,
@@ -33,11 +39,11 @@ var MapExamples = (() => {
 		}
 	});
 	
-	async function MapReactive() {
+	function MapReactive() {
 		const {div, p, label, input, ul, li, strong} = elements();
 	
 		const center = createData(FranceCenter());
-		const zoom = createData(6);
+		const zoom = createData(5);
 	
 		const provider = OpenStreetMapProvider();
 	
@@ -60,7 +66,7 @@ var MapExamples = (() => {
 				marker.setLatLng(center);
 			});
 		};
-	
+		
 		return div(
 			p(
 				label(strong("Latitude : "), input({
@@ -86,17 +92,31 @@ var MapExamples = (() => {
 					onInput: e => zoom.value = parseFloat(e.target.value)
 				}))
 			),
-			await MapContainer({provider, mount, center, scrollWheelZoom: false, zoom, minZoom: 4})
+			Suspense({fallback: BounceLoader()},
+				MapContainer({provider, mount, center, scrollWheelZoom: false, zoom})
+			)
 		);
 	}
 	
-	async function MapIPGeolocation() {
+	function MapIPGeolocation() {
 		const {div, form, input, ul, li, strong} = elements();
 	
 		const address = createData("");
 		const data = createData({});
 	
 		const mount = map => {
+			// Création d'un effet pour lire les données de l’API au changement de l'adresse IP
+			createEffect(async () => {
+				try {
+					/* Autre : https://api.ipquery.io/ */
+					const a = (address.value ? "/" + address : "").replace(/ /g, "");
+					const response = await fetch(`https://get.geojs.io/v1/ip/geo${a}.json`);
+					setData(data, await response.json());
+				} catch (error) {
+					console.error(error);
+				}
+			});
+	
 			// Création du marqueur et de sa popup avec un contenu réactif sur les données reçues de l'API
 			const labels = ["IP", "Continent", "Pays", "Région", "Ville", "Latitude", "Longitude", "ISP", "Zone horaire", "Précision"];
 			const keys = ['ip', "continent_code", "country", "region", "city", "latitude", "longitude", "organization_name", "timezone", "accuracy"];
@@ -116,24 +136,13 @@ var MapExamples = (() => {
 			});
 		};
 	
-		const readData = async () => {
-			try {
-				/* Autre : https://api.ipquery.io/ */
-				const a = (address.value ? "/" + address : "").replace(/ /g, "");
-				const response = await fetch(`https://get.geojs.io/v1/ip/geo${a}.json`);
-				setData(data, await response.json());
-			} catch (error) {
-				console.error(error);
-			}
-		};
-	
 		const onSubmit = e => {
 			address.value = e.target.address.value;
 			e.target.address.select();
 			return false;
 		};
 		
-		return div({onMount: () => createEffect(readData)},
+		return div(
 			form({onSubmit},
 				input({
 					type: "search",
@@ -145,12 +154,14 @@ var MapExamples = (() => {
 					placeholder: "Adresse IP (V4 ou V6)"
 				})
 			),
-			await MapContainer({provider: OpenStreetMapProvider(), mount, center: FranceCenter(), scrollWheelZoom: false, zoom: 5})
+			Suspense({fallback: BounceLoader()},
+				MapContainer({provider: OpenStreetMapProvider(), mount, center: FranceCenter(), scrollWheelZoom: false, zoom: 5})
+			)
 		);
 	}
 	
-	async function MapGeoJSON() {
-		const {a, ul, li, strong} = elements();
+	function MapGeoJSON() {
+		const {div, a, ul, li, strong} = elements();
 	
 		const options = () => {
 			const blueMarker = L.divIcon({className: "marker blue", iconSize: [24, 24]});
@@ -170,29 +181,38 @@ var MapExamples = (() => {
 			li(strong("Code INSEE : "), layer.feature.properties.insee_commune)
 		);
 	
-		let mount;
-		try {
-			const response = await fetch("/data/dreal.geojson");
-			mount = async map => L.geoJSON(await response.json(), options()).bindPopup(popup, {className: "mapPopup"}).addTo(map);
-		} catch (e) {
-			console.error(e);
-		}
+		const mount = async map => {
+			try {
+				const response = await fetch("/data/dreal.geojson");
+				L.geoJSON(await response.json(), options()).bindPopup(popup, {className: "mapPopup"}).addTo(map);
+			} catch (e) {
+				console.error(e);
+			}
+		};
 	
-		return await MapContainer({provider: OpenStreetMapProvider(), mount, center: FranceCenter(), scrollWheelZoom: false, zoom: 6});
+		return div(
+			Suspense({fallback: BounceLoader()},
+				MapContainer({provider: OpenStreetMapProvider(), mount, center: FranceCenter(), scrollWheelZoom: false, zoom: 6})
+			)
+		);
 	}
 	
-	async function MapNexrad() {
+	function MapNexrad() {
 		const mount = map => addTileLayer(map, NexradProvider());
-		return await MapContainer({provider: OpenStreetMapProvider(), mount, center: USACenter(), scrollWheelZoom: false, zoom: 4});
+		return elements().div(
+			Suspense({fallback: BounceLoader()},
+				MapContainer({provider: OpenStreetMapProvider(), mount, center: USACenter(), scrollWheelZoom: false, zoom: 4})
+			)
+		);
 	}
 	
-	async function MapNexradAnimated() {
+	function MapNexradAnimated() {
 		const {div, p, label, span, strong, input} = elements();
 	
 		const timeStep = 5; // 5 minutes
 		const index = createData(0);
 		const speed = createData(0);
-		const layers = [];
+		let layers = [];
 		let currentLayer;
 		let timer = null;
 	
@@ -222,7 +242,12 @@ var MapExamples = (() => {
 		};
 	
 		// Indispensable pour arrêter le timer
-		const unmount = () => clearInterval(timer);
+		const unmount = () => {
+			clearInterval(timer);
+			currentLayer = null;
+			layers.forEach(layer => layer && layer.remove());
+			layers = null;
+		};
 	
 		return div(
 			p(
@@ -233,35 +258,67 @@ var MapExamples = (() => {
 					span(" ", speed, " s")
 				)
 			),
-			await MapContainer({provider: OpenStreetMapProvider(), mount, unmount, center: USACenter(), scrollWheelZoom: false, zoom: 4})
+			Suspense({fallback: BounceLoader()},
+				MapContainer({provider: OpenStreetMapProvider(), mount, unmount, center: USACenter(), scrollWheelZoom: false, zoom: 4})
+			)
 		);
 	}
 	
-	async function MapWorldRadarAnimated() {
-		const {div, p, label, span, strong, input, select, option} = elements();
+	function MapWorldRadarAnimated() {
+		const {div, p, label, span, strong, input, select, option, button} = elements();
 	
 		const timeStep = 10; // 10 minutes
 		const timeCountByHour = 60 / timeStep;
 		const maxHours = 12;
 		const times = createData([]);
-		const layers = []
+		const index = createData(0);
+		const speed = createData(0);
+		const error = createData("");
+		let layers = [];
+		let duration = 2; // 2 heures par défaut
 		let currentLayer;
 		let timer = null;
 	
-		try {
-			const response = await fetch("https://api.rainviewer.com/public/maps.json");
-			times.push(...await response.json());
-			layers.length = times.length;
-			layers.fill(null);
-			setDuration(2);
-		} catch (e) {
-			console.error(e);
-		}
+		const removeLayer = layer => layer && layer.remove();
 	
-		const index = createData(times.length - 1);
-		const speed = createData(0);
+		const updateTimes = () => {
+			if (duration > 0 && duration <= maxHours) {
+				const count = duration * timeCountByHour + 1;
+				while (times.length < count) {
+					times.unshift(times[0] - 60 * timeStep);
+					layers.unshift(null);
+					index.value++;
+				}
+				while (times.length > count) {
+					times.shift();
+					removeLayer(layers.shift());
+					index.value--;
+				}
+				index.value <= 0 && (index.value = 0);
+			}
+		};
 	
-		const mount = map => {
+		const load = async () => {
+			try {
+				setData(error, "");
+				const response = await fetch("https://api.rainviewer.com/public/maps.json");
+				setData(times, await response.json());
+				index.value = 0;
+				layers.forEach(removeLayer);
+				layers.length = times.length;
+				layers.fill(null);
+				currentLayer = null;
+				updateTimes();
+				index.value = times.length - 1;
+			} catch (e) {
+				setData(error, e);
+			}
+		};
+	
+		const mount = async map => {
+			// Chargement initial du JSON de l’API
+			await load();
+	
 			// Ajout des layers au montage de la carte ou si la donnée observable times change
 			createEffect(() => {
 				layers.forEach((layer, i) => !layer && (layers[i] = addTileLayer(map, RainViewerProvider(times[i], 4, 1, 1))));
@@ -283,36 +340,28 @@ var MapExamples = (() => {
 		};
 	
 		// Indispensable pour arrêter le timer
-		const unmount = () => clearInterval(timer);
-	
-		const setDuration = duration => {
-			if (duration > 0 && duration <= maxHours) {
-				const count = duration * timeCountByHour + 1;
-				while (times.length < count) {
-					times.unshift(times[0] - 60 * timeStep);
-					layers.unshift(null);
-					index.value++;
-				}
-				while (times.length > count) {
-					times.shift();
-					let layer = layers.shift();
-					layer && layer.remove();
-					index.value--;
-				}
-				index.value <= 0 && (index.value = 0);
-			}
+		const unmount = () => {
+			clearInterval(timer);
+			currentLayer = null;
+			layers.forEach(removeLayer);
+			layers = null;
 		};
 	
-		const getLocalDate = index => (new Date(times[index] * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"});
-
+		const getLocalDate = i => i < times.length ? (new Date(times[i] * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"}) : "";
+	
+		// Retour de l’interface et la carte
 		return div(
 			p(
 				label(
 					strong("Période : "),
-					select({onChange: e => setDuration(e.target.value)}, [...Array(maxHours)].map((v, i) => option({value: i + 1, selected: i + 1 == (times.length - 1) / timeCountByHour}, (i + 1) + " heure" + (i ? "s" : "")))),
+					select({onChange: e => (duration = e.target.value, updateTimes())},
+						[...Array(maxHours)].map((v, i) => option({value: i + 1, selected: i + 1 == duration}, (i + 1) + " heure" + (i ? "s" : "")))
+					),
 					span(() => getLocalDate(0)),
 					input({type: "range", min: 0, max: () => times.length - 1, value: index, onInput: e => index.value = e.target.value}),
-					span(() => getLocalDate(index))
+					span(() => getLocalDate(index)),
+					button({onclick: load}, "Recharger"),
+					span(error)
 				),
 				label(
 					strong("Animation : "),
@@ -320,7 +369,9 @@ var MapExamples = (() => {
 					span(() => speed.value == 0 ? "Arrêt" : speed + " s pour 1 heure")
 				)
 			),
-			await MapContainer({provider: OpenStreetMapProvider(), mount, unmount, center: EUCenter(), scrollWheelZoom: false, zoom: 5})
+			Suspense({fallback: BounceLoader()},
+				MapContainer({provider: OpenStreetMapProvider(), mount, unmount, center: EUCenter(), scrollWheelZoom: false, zoom: 4})
+			)
 		);
 	}
 

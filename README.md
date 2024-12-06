@@ -1,5 +1,5 @@
 # Room-Test
-Le dépôt **Room-Test** contient des exemples de codes JavaScript de **Room** et **Room-Leaflet** utilisés dans une page **HTML** avec une interface utilisateur minimaliste.
+Le dépôt **Room-Test** contient des exemples de codes JavaScript de **Room**, **Room-Suspense** et **Room-Leaflet** utilisés dans une page **HTML** avec une interface utilisateur minimaliste.
 
 Deux versions sont disponibles :
 
@@ -11,13 +11,13 @@ Les fichiers Javascript sont rassemblés dans un répertoire `/esm/` pour la ver
 Les fichiers sont en version **ESM** :
 
 * `index.js` : le point d'entrée pour afficher l'interface de sélection des exemples.
-* `simple-examples.js` : un module contenant 4 exemples simples.
+* `simple-examples.js` : un module contenant 6 exemples simples.
 * `todolist-examples.js` : un module contenant 3 exemples de todoList.
-* `map-examples.js` : un module contenant 6 exemples de cartes interactives sur la base de **Room-Leaflet**.
+* `map-examples.js` : un module contenant 6 exemples de cartes interactives sur la base de **Room-Leaflet**. et utilisant également **Room-Suspense**.
 
 En version non **ESM**, les fichiers ont les mêmes noms mais avec le suffixe `-nm` pour non module, soit : `index-nm.js`, `simple-examples-nm.js`, `todolist-examples-nm.js` et `map-examples-nm.js`.
 
-Treize exemples sont donc disponibles au total et organisés en composants.
+Quinze exemples sont donc disponibles au total et organisés en composants.
 
 ## DoubleCount1
 Un exemple simple de double compteur avec somme.
@@ -30,6 +30,12 @@ Un exemple d’une donnée observable créée avec un objet auquel un symbole `t
 
 ## ArrayManipulation
 Un exemple sur une donnée observable d'un tableau avec l’utilisation des méthodes `reverse()`, `sort()` et `splice()` et de la réctivité engendrée.
+
+## Style
+Un exemple d’utilisation d’un objet littéral comme valeur de l’attribut style, une possibilité ajoutée avec la version **1.1.0** de **Room**.
+
+## Suspense
+Quelques exemples d’utilisation du composant **Room-Suspense**.
 
 ## TodoListExample
 Un exemple complet de todoList sur la base d’une donnée observable d’un tableau et exploitant la fonction `map()` de **Room**.
