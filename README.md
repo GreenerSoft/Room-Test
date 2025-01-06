@@ -6,6 +6,11 @@ Deux versions sont disponibles :
 1. **index.html** : La version en module **ECMAScript 6**, elle nécessite un serveur Web pour fonctionner.
 2. **index-nm.html** : La version non **ECMAScript** qui peut être utilisé avec le protocole `file://` (à l'exception d’un exemple).
 
+Vous pouvez essayer ces pages **HTML** directement sur **GitHub** avec les liens suivants :
+
+1. **[https://greenersoft.github.io/Room-Test/index.html](https://greenersoft.github.io/Room-Test/index.html)**
+2. **[https://greenersoft.github.io/Room-Test/index-nm.html](https://greenersoft.github.io/Room-Test/index-nm.html)**
+
 Les fichiers Javascript sont rassemblés dans un répertoire `/esm/` pour la version en module **ECMAScript** et dans un répertoire `/js/` pour la version non **ECMAScript**.
 
 Les fichiers sont en version **ESM** :
