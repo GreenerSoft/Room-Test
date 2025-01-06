@@ -183,7 +183,7 @@ var MapExamples = (() => {
 	
 		const mount = async map => {
 			try {
-				const response = await fetch("/data/dreal.geojson");
+				const response = await fetch("data/dreal.geojson");
 				L.geoJSON(await response.json(), options()).bindPopup(popup, {className: "mapPopup"}).addTo(map);
 			} catch (e) {
 				console.error(e);
